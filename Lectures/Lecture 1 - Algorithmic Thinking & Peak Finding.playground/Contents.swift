@@ -30,7 +30,7 @@ let array = [7,2,5,6,7,8]
 // Poor Performance Version - Linear
 // Worst case complexity is Ø(n)
 
-func findPeak<T: Integer>(forArray array: [T]) -> T {
+func find1DPeak<T: Integer>(forArray array: [T]) -> T {
 	
 	for (i,element) in array.enumerated() {
 		
@@ -51,29 +51,138 @@ func findPeak<T: Integer>(forArray array: [T]) -> T {
 	return -1
 }
 
-findPeak(forArray: array)
+find1DPeak(forArray: array)
+
+
+// Zero element example - You must declare argument type as an array of Integers as type cannot be inferred from an empty array. Trying to pass an empty array without typecasting will result in a compiler error.
+
+find1DPeak(forArray: [] as [Int])
+
 
 
 // Higher Performance Version - Logarithmic
 // Here we use binary search/divide and conquer technique to improve the algorithms' performance to Ø(log^2(n))
 
-func findPeakQuickly<T: Integer>(forArray array: [T]) -> T {
+func find1DPeakQuickly<T: Integer>(forArray array: [T]) -> T {
+	
+	// Account for zero element array
+	if array.isEmpty {
+		return -1
+	}
 	
 	let n = array.count - 1
 	let middleIndex = n/2
 	
 	if middleIndex == 0 {
-		return array[middleIndex]
+		return array[middleIndex] 
 	} else if array[middleIndex] <= array[middleIndex - 1] {
 		// Take left slice of the array
 		let leftArray = array[0...middleIndex-1]
-		return findPeakQuickly(forArray: Array(leftArray))
+		return find1DPeakQuickly(forArray: Array(leftArray))
 	} else if array[middleIndex] <= array[middleIndex + 1] {
 		// Take right slice of the array
 		let rightArray = array[middleIndex+1...n]
-		return findPeakQuickly(forArray:  Array(rightArray))
+		return find1DPeakQuickly(forArray:  Array(rightArray))
 	} else {
 		return array[middleIndex]
 	}
 }
+
+find1DPeakQuickly(forArray: array)
+
+// Zero element example - ou must declare argument type as an array of Integers as type cannot be inferred from an empty array. Trying to pass an empty array without typecasting will result in a compiler error.
+
+find1DPeakQuickly(forArray: [] as [Int])
+
+
+
+/*
+
+*** Peak Finding in a 2D Array ***
+
+Peak Definition:
+	
+for an array 
+[[a,b,c,d],
+ [e,f,g,h],
+ [i,j,k,l]] where a...l are integers
+
+if f >= b  AND f >= e AND f >= g AND f >= j then peak = f
+
+Objective:
+To find a peak for a 2-D array
+
+*/
+
+let array2D = [[10,11,12,13],
+               [21,12,17,18],
+               [12,16,28,21],
+               [11,14,15,20]]
+
+
+// Poor Performance Version - Quadratic
+// Worst case complexity is Ø(n^2)
+
+func find2DPeak<T: Integer>(inArray array: [[T]]) -> T {
+	
+	// Complete poor performance version of findPeak2D
+	
+	return -1
+}
+
+
+// Higher Performance Version - Linearithmic
+// Worst case complexity is to Ø2(log^2(n))
+
+func find2DPeakQuickly<T: Integer>(forArray array: [[T]]) -> T {
+
+	if array.count == 1 {
+		// Account for empty array of empty array
+		if array[0].isEmpty {
+			return -1
+		} else {
+			// Account for only 1 row or non-empty array
+			return find1DPeakQuickly(forArray: array[0])
+		}
+	}
+	
+	// Find middle column index
+	let m = array[0].count - 1 // columns
+	let middleColumn = m/2
+	
+	// Assemble middle column as an array
+	var middleColumnElements: [T] = []
+	for array1D in array {
+		let mValue = array1D[middleColumn]
+		middleColumnElements.append(mValue)
+	}
+	
+	// Find global max on middle column at (i, j)
+	var maxM: T = -1
+	var maxMRow: T = 0
+	for (i, element) in middleColumnElements.enumerated() {
+		if element >= maxM {
+			maxM = element
+			maxMRow = i as! T
+		}
+	}
+	
+	let peakRow = array[maxMRow as! Int]
+	let ij = peakRow[middleColumn]
+	
+	if peakRow[middleColumn - 1] >= ij {
+		// Take left slice of the array
+		let leftSlice = peakRow[0...middleColumn - 1]
+		return find1DPeakQuickly(forArray: Array(leftSlice))
+	} else if peakRow[middleColumn + 1] >= ij {
+		// Take right slice of the array
+		let rightSlice = peakRow[middleColumn + 1...m]
+		return find1DPeakQuickly(forArray: Array(rightSlice))
+	} else {
+		// As both (i,j-1) and (i, j+1) are less than (i,j) -> (i.j) is a peak
+		return ij
+	}
+}
+
+find2DPeakQuickly(forArray: array2D)
 
